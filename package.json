@@ -5,11 +5,20 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "lint:fix": "vue-cli-service lint --fix"
   },
   "dependencies": {
+    "adapterjs": "^0.15.4",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "recordrtc": "^5.6.1",
+    "rtcmulticonnection": "^3.7.0",
+    "socket.io": "^3.1.1",
+    "socket.io-client": "^3.1.1",
+    "url-parse": "^1.4.7",
+    "vue": "^2.6.11",
+    "vue-socket.io": "^3.0.10",
+    "vue-webrtc": "^1.2.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
