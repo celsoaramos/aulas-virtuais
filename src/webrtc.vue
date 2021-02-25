@@ -1,19 +1,19 @@
 <template>
   <div class='video-list'>
     <div
-      v-for='item in videoList'
-      v-bind:video='item'
-      v-bind:key='item.id'
-      class='video-item'
+      v-for="item in videoList"
+      v-bind:video="item"
+      v-bind:key="item.id"
+      class="video-item"
     >
       <video
         controls
         autoplay
         playsinline
-        ref='videos'
-        :height='cameraHeight'
-        :muted='item.muted'
-        :id='item.id'
+        ref="videos"
+        :height="cameraHeight"
+        :muted="item.muted"
+        :id="item.id"
       ></video>
     </div>
   </div>
@@ -38,6 +38,7 @@ export default {
       canvas: null,
       recorder: null,
       stream: null,
+      video: null,
     };
   },
   props: {
@@ -156,45 +157,63 @@ export default {
       that.videoList = newList;
       that.$emit('left-room', stream.streamid);
     };
-
-    this.stream = navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-
-    this.recorder = new RecordRTCPromisesHandler(this.stream, {
-      type: 'video',
-    });
   },
   methods: {
+
     join() {
       const that = this;
-      console.log('this.rtcmConnection', this.rtcmConnection.socketURL);
-      console.log('this.roomId', this.roomId);
       this.rtcmConnection.openOrJoin(this.roomId, (isRoomExist, roomid) => {
-        console.log('isRoomExist', isRoomExist);
-        console.log('roomid', roomid);
         if (isRoomExist === false && that.rtcmConnection.isInitiator === true) {
           that.$emit('opened-room', roomid);
         }
+        this.startRecord();
       });
-      this.startRecord();
     },
     async startRecord() {
+      const { MediaStreamRecorder } = RecordRTCPromisesHandler;
+      console.log('media strem recorder', MediaStreamRecorder);
+      this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.recorder = new RecordRTCPromisesHandler(this.stream, {
+        type: 'video',
+        mimeType: 'video/webm',
+        recorderType: MediaStreamRecorder,
+        bitsPerSecond: 128000,
+      });
+
       this.recorder.startRecording();
     },
-    leave() {
+    async leave() {
+      console.log('stream', this.stream);
+      console.log('recorder', this.recorder);
+
       this.rtcmConnection.attachStreams.forEach((localStream) => {
         localStream.stop();
       });
       this.videoList = [];
-      this.stopRecorder();
-    },
-    async stopRecorder() {
-      this.recorder.stopRecording();
-      const blob = await this.recorder.getBlob();
-      console.log('blob', blob);
-      // invokeSaveAsDialog(blob);
+
+      await this.recorder.stopRecording(() => {
+        const blob = this.recorder.getBlob();
+        console.log('blob', blob);
+        const fileType = blob.type.split('/')[0];
+        console.log('fileType', fileType);
+        // window.open(URL.createObjectURL(blob));
+
+        const url = URL.createObjectURL(blob);
+        console.log('url', url);
+        const mediaSource = new MediaSource(url);
+        console.log(mediaSource);
+        // const { invokeSaveAsDialog } = RecordRTCPromisesHandler;
+        // invokeSaveAsDialog(blob);
+      });
+
+      /* // reset recorder's state
+      await this.recorder.reset();
+
+      // clear the memory
+      await this.recorder.destroy();
+
+      // so that we can record again
+      this.recorder = null; */
     },
     capture() {
       return this.getCanvas().toDataURL(this.screenshotFormat);
@@ -239,7 +258,7 @@ export default {
               callback();
               // eslint-disable-next-line func-names
               // eslint-disable-next-line no-param-reassign
-              callback = () => {};
+              callback = () => { };
             },
             false,
           );
