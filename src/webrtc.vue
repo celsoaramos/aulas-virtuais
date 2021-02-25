@@ -1,19 +1,19 @@
 <template>
   <div class='video-list'>
     <div
-      v-for="item in videoList"
-      v-bind:video="item"
-      v-bind:key="item.id"
-      class="video-item"
+      v-for='item in videoList'
+      v-bind:video='item'
+      v-bind:key='item.id'
+      class='video-item'
     >
       <video
         controls
         autoplay
         playsinline
-        ref="videos"
-        :height="cameraHeight"
-        :muted="item.muted"
-        :id="item.id"
+        ref='videos'
+        :height='cameraHeight'
+        :muted='item.muted'
+        :id='item.id'
       ></video>
     </div>
   </div>
@@ -156,6 +156,15 @@ export default {
       that.videoList = newList;
       that.$emit('left-room', stream.streamid);
     };
+
+    this.stream = navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
+
+    this.recorder = new RecordRTCPromisesHandler(this.stream, {
+      type: 'video',
+    });
   },
   methods: {
     join() {
@@ -173,13 +182,24 @@ export default {
     },
     async startRecord() {
       console.log('entrou!!');
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      const recorder = new RecordRTCPromisesHandler(stream, {
-        type: 'video',
-      });
-
-      this.stream = stream;
-      this.recorder = recorder;
+      // const stream = await navigator.mediaDevices.getUserMedia({
+      // video: true,
+      // audio: true,
+      // });
+      // const recorder = new RecordRTCPromisesHandler(stream, {
+      // type: 'video',
+      // });
+      console.log('startRecord() - recorder =======');
+      this.recorder.startRecording();
+      // const sleep = (m) => new Promise((r) => setTimeout(r, m));
+      // await sleep(3000);
+      // await recorder.stopRecording();
+      // const blob = await recorder.getBlob();
+      // console.log(blob);
+      // invokeSaveAsDialog(blob);
+      console.log(this.recorder);
+      // this.stream = stream;
+      // this.recorder = recorder;
       this.recorder.startRecording();
     },
     leave() {
@@ -238,7 +258,7 @@ export default {
               callback();
               // eslint-disable-next-line func-names
               // eslint-disable-next-line no-param-reassign
-              callback = () => { };
+              callback = () => {};
             },
             false,
           );
