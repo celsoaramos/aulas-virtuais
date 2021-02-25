@@ -181,25 +181,6 @@ export default {
       this.startRecord();
     },
     async startRecord() {
-      console.log('entrou!!');
-      // const stream = await navigator.mediaDevices.getUserMedia({
-      // video: true,
-      // audio: true,
-      // });
-      // const recorder = new RecordRTCPromisesHandler(stream, {
-      // type: 'video',
-      // });
-      console.log('startRecord() - recorder =======');
-      this.recorder.startRecording();
-      // const sleep = (m) => new Promise((r) => setTimeout(r, m));
-      // await sleep(3000);
-      // await recorder.stopRecording();
-      // const blob = await recorder.getBlob();
-      // console.log(blob);
-      // invokeSaveAsDialog(blob);
-      console.log(this.recorder);
-      // this.stream = stream;
-      // this.recorder = recorder;
       this.recorder.startRecording();
     },
     leave() {
