@@ -172,17 +172,32 @@ export default {
     async startRecord() {
       const { MediaStreamRecorder } = RecordRTCPromisesHandler;
       console.log('media strem recorder', MediaStreamRecorder);
-      this.stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
       this.recorder = new RecordRTCPromisesHandler(this.stream, {
         type: 'video',
         mimeType: 'video/webm',
         recorderType: MediaStreamRecorder,
-        bitsPerSecond: 128000,
+        // used by CanvasRecorder and WhammyRecorder
+        // HTMLVideoElement,
+        // you can pass {width:640, height: 480} as well
+        video: {
+          width: 1920,
+          height: 1084,
+        },
+        // used by CanvasRecorder and WhammyRecorder
+        canvas: {
+          width: 1920,
+          height: 1084,
+        },
       });
 
       this.recorder.startRecording();
     },
     async leave() {
+      const that = this;
       console.log('stream', this.stream);
       console.log('recorder', this.recorder);
 
@@ -202,6 +217,11 @@ export default {
         console.log('url', url);
         const mediaSource = new MediaSource(url);
         console.log(mediaSource);
+
+        this.stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+        that.$emit('left-room', blob);
         // const { invokeSaveAsDialog } = RecordRTCPromisesHandler;
         // invokeSaveAsDialog(blob);
       });

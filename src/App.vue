@@ -8,16 +8,19 @@
     </div>
     <div class="row">
       <div class="col-md-12">
-        <div class="">
+        <div class="col-md-6">
           <vue-webrtc ref="webrtc"
                       width="100%"
                       :roomId="roomId"
                       v-on:joined-room="logEvent"
-                      v-on:left-room="logEvent"
+                      v-on:left-room="fimTransmissao"
                       v-on:opened-room="logEvent"
                       v-on:share-started="logEvent"
                       v-on:share-stopped="logEvent"
                       @error="onError" />
+        </div>
+        <div class="col-md-6">
+          <video id="video-gravado" controls></video>
         </div>
         <div class="row">
           <div class="col-md-12 my-3">
@@ -62,6 +65,7 @@ export default {
     return {
       img: null,
       roomId: 'public-room',
+      blob: '',
     };
   },
   computed: {
@@ -87,6 +91,13 @@ export default {
     },
     logEvent(event) {
       console.log('Event : ', event);
+    },
+    fimTransmissao(event) {
+      console.log('evento: ', event);
+      this.blob = event;
+      const videoGravado = document.getElementById('video-gravado');
+      videoGravado.autoplay = true;
+      videoGravado.src = window.URL.createObjectURL(this.blob);
     },
   },
 };
